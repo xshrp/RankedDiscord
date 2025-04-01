@@ -1,4 +1,6 @@
 const fs = require("fs");
+const path = require("path");
+
 const DATOS = require("../datos.json");
 const CONFIG = require("../config.json");
 const { crearEmbed } = require("../utiles/embeds");
@@ -19,7 +21,7 @@ function ejecutarWin(message, client) {
         message.channel.send({ embeds: [errorEmbed] });
         return;
     }
-    if (AUTOR == MENCIONADO) {
+    if (AUTOR.id == MENCIONADO.id) {
         errorEmbed.setDescription("¿Estas intentando reportar una partida contigo mismo? :/");
         message.channel.send({ embeds: [errorEmbed] });
         return;
@@ -45,14 +47,12 @@ function ejecutarWin(message, client) {
         confirmacion.react('✅').then(() => confirmacion.react('❌'));
 
         // Creo un filtro y espero la reaccion del otro usuario
-        const filtro = (reaccion, reaccionUsuario) => {
-            return (["✅", "❌"].includes(reaccion.emoji.name) && reaccionUsuario.id === MENCIONADO.id)
+        const filtro = (reaction, user) => {
+            return ["✅", "❌"].includes(reaction.emoji.name) && user.id === MENCIONADO.id;
         };
-
-        confirmacion.awaitReactions(filtro, { max: 1, time: 30000, errors: ["time"] }).then(reacciones => {
-            const REACCION = reacciones.first();
-
-            switch (REACCION.emoji.name) {
+        const collector = confirmacion.createReactionCollector({ filter: filtro, max: 1, time: 30000 });
+        collector.on('collect', (reaccion) => {
+            switch (reaccion.emoji.name) {
                 case '✅':
                     const resultadosPartida = calcularEloPartida(DATOS[AUTOR.id].elo, DATOS[MENCIONADO.id].elo);
 
@@ -64,8 +64,8 @@ function ejecutarWin(message, client) {
 
                     DATOS[AUTOR.id].totalGanadas += 1;
 
-                    fs.writeFile("../datos.json", JSON.stringify(DATOS, null, 4), err => {
-                        if (err) throw err;
+                    fs.writeFile(path.join(__dirname, "../datos.json"), JSON.stringify(DATOS, null, 4), (err) => {
+                        if (err) console.error("Error guardando datos:", err);
                     });
 
                     let confirmada = crearEmbed(
@@ -80,7 +80,6 @@ function ejecutarWin(message, client) {
 
                     client.channels.cache.get(CONFIG.canales.reportes).send({ embeds: [confirmada] });
                     break;
-
                 case '❌':
                     let rechazada = crearEmbed("**Partida rechazada**", `${AUTOR} tu partida fue rechazada. ❌`, "#ff0000")
                         .setFooter({ text: "Si crees que es un error, habla con el usuario mencionado o un administrador." });
@@ -88,13 +87,21 @@ function ejecutarWin(message, client) {
                     break;
             }
         });
+        collector.on('end', (reacciones, motivo) => {
+            if (motivo === "time") {
+                confirmacion.delete();
+                let noRespondido = crearEmbed(
+                    "**Sin confirmar**",
+                    `${AUTOR} tu partida no fue respondida a tiempo. 🕓`,
+                    "#ff8000"
+                ).setFooter({ text: "Han pasado los 30 segundos de confirmacion." });
+                message.channel.send({ embeds: [noRespondido] });
+            }
+        });
 
-    }).catch(reacciones => {
-        confirmacion.delete();
-        let noRespondido = crearEmbed("**Sin confirmar**", `${AUTOR} tu partida no fue respondida a tiempo. 🕓`, "#ff8000")
-            .setFooter({ text: "Han pasado los 30 segundos de confirmacion." });
-        message.channel.send({ embeds: [noRespondido] });
-    })
+    }).catch(err => {
+        console.error("Error al confirmar:", err);
+    });
 }
 
 module.exports = { ejecutarWin };

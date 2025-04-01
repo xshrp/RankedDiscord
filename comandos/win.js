@@ -1,3 +1,4 @@
+const fs = require("fs");
 const DATOS = require("../datos.json");
 const CONFIG = require("../config.json");
 const { crearEmbed } = require("../utiles/embeds");

@@ -1,8 +1,16 @@
 {
     "356952057531596800": {
         "nick": "xshrp_",
-        "elo": 1000,
-        "totalPartidas": 0,
+        "elo": 1031,
+        "totalPartidas": 2,
+        "totalGanadas": 2,
+        "estaActivo": true,
+        "rango": "Bronce"
+    },
+    "408627569525653505": {
+        "nick": "xquacky",
+        "elo": 969,
+        "totalPartidas": 2,
         "totalGanadas": 0,
         "estaActivo": true,
         "rango": "Bronce"

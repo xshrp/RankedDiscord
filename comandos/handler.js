@@ -8,7 +8,7 @@ const { ejecutarWin } = require("./win");
 
 const PREFIJO = "r/";
 
-function handler(message, client) {
+async function handler(message, client) {
     const args = message.content.split(/ +/g);
     const command = args.shift().toLowerCase();
 
@@ -32,7 +32,7 @@ function handler(message, client) {
             ejecutarBackupManual(message);
             break;
         case `${PREFIJO}win`:
-            ejecutarWin(message, client);
+            await ejecutarWin(message, client);
             break;
     }
 }

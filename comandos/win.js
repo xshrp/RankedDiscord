@@ -6,7 +6,7 @@ const CONFIG = require("../config.json");
 const { crearEmbed } = require("../utiles/embeds");
 const { calcularEloPartida } = require("../utiles/funciones");
 
-function ejecutarWin(message, client) {
+async function ejecutarWin(message, client) {
     const AUTOR = message.author;
     const MENCIONADO = message.mentions.users.first();
 
@@ -41,17 +41,17 @@ function ejecutarWin(message, client) {
         "#ffdf00",
         message.author.displayAvatarURL()
     );
+
     confEmbed.setFooter({ text: "Tiempo para confirmar: 30 segundos. 🕒" });
+    try {
+        let confirmacion = await message.channel.send({ embeds: [confEmbed] });
+        await confirmacion.react('✅');
+        await confirmacion.react('❌');
 
-    message.channel.send({ embeds: [confEmbed] }).then(confirmacion => {
-        confirmacion.react('✅').then(() => confirmacion.react('❌'));
-
-        // Creo un filtro y espero la reaccion del otro usuario
-        const filtro = (reaction, user) => {
-            return ["✅", "❌"].includes(reaction.emoji.name) && user.id === MENCIONADO.id;
-        };
+        const filtro = (reaction, user) => ['✅', '❌'].includes(reaction.emoji.name) && user.id === MENCIONADO.id;
         const collector = confirmacion.createReactionCollector({ filter: filtro, max: 1, time: 30000 });
-        collector.on('collect', (reaccion) => {
+
+        collector.on('collect', async (reaccion) => {
             switch (reaccion.emoji.name) {
                 case '✅':
                     const resultadosPartida = calcularEloPartida(DATOS[AUTOR.id].elo, DATOS[MENCIONADO.id].elo);
@@ -67,41 +67,55 @@ function ejecutarWin(message, client) {
                     fs.writeFile(path.join(__dirname, "../datos.json"), JSON.stringify(DATOS, null, 4), (err) => {
                         if (err) console.error("Error guardando datos:", err);
                     });
+                    await confirmacion.delete();
 
                     let confirmada = crearEmbed(
                         "**Reporte.**",
                         `**Ranked.**
                         El usuario ${AUTOR} le ha ganado a ${MENCIONADO}.\n
                         **Estado:** Confirmado. ✅\n
-                        El nuevo elo de ${AUTOR} es de ${resultadosPartida.nuevoEloGanador}, mientras el elo de ${MENCIONADO} bajo ${resultadosPartida.nuevoEloPerdedor}.`,
-                        "ffdf00",
+                        El nuevo elo de ${AUTOR} es de ${resultadosPartida.nuevoEloGanador}, mientras el elo de ${MENCIONADO} bajó a ${resultadosPartida.nuevoEloPerdedor}.`,
+                        "#ffdf00",
                         AUTOR.displayAvatarURL()
                     );
 
-                    client.channels.cache.get(CONFIG.canales.reportes).send({ embeds: [confirmada] });
+                    await client.channels.cache.get(CONFIG.canales.reportes).send({ embeds: [confirmada] });
+                    let informacion = crearEmbed(
+                        "**Partida confirmada**",
+                        `${AUTOR} tu partida fue confirmada. ✅`,
+                        "#32cd32"
+                    )
+                    await message.channel.send({ embeds: [informacion] });
                     break;
+
                 case '❌':
-                    let rechazada = crearEmbed("**Partida rechazada**", `${AUTOR} tu partida fue rechazada. ❌`, "#ff0000")
-                        .setFooter({ text: "Si crees que es un error, habla con el usuario mencionado o un administrador." });
-                    message.channel.send({ embeds: [rechazada] });
+                    await confirmacion.delete();
+                    let rechazada = crearEmbed(
+                        "**Partida rechazada**",
+                        `${AUTOR} tu partida fue rechazada. ❌`,
+                        "#ff0000"
+                    ).setFooter({ text: "Si crees que es un error, habla con el usuario mencionado o un administrador." });
+
+                    await message.channel.send({ embeds: [rechazada] });
                     break;
             }
         });
-        collector.on('end', (reacciones, motivo) => {
+        collector.on('end', async (reacciones, motivo) => {
             if (motivo === "time") {
-                confirmacion.delete();
+                await confirmacion.delete();
                 let noRespondido = crearEmbed(
                     "**Sin confirmar**",
                     `${AUTOR} tu partida no fue respondida a tiempo. 🕓`,
                     "#ff8000"
-                ).setFooter({ text: "Han pasado los 30 segundos de confirmacion." });
-                message.channel.send({ embeds: [noRespondido] });
+                ).setFooter({ text: "Han pasado los 30 segundos de confirmación." });
+
+                await message.channel.send({ embeds: [noRespondido] });
             }
         });
 
-    }).catch(err => {
-        console.error("Error al confirmar:", err);
-    });
+    } catch (err) {
+        console.error("Error al confirmar una partida:", err);
+    }
 }
 
 module.exports = { ejecutarWin };

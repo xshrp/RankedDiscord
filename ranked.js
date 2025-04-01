@@ -4,7 +4,7 @@ const { handler } = require('./comandos/handler');
 const config = require("./config.json");
 
 const client = new Client({
-    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent]
+    intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.MessageContent, GatewayIntentBits.GuildMessageReactions]
 });
 
 client.once("ready", () => {
@@ -23,7 +23,7 @@ client.once("ready", () => {
     }, 5000);
 });
 
-client.on("messageCreate", (message) => {
+client.on("messageCreate", async (message) => {
     if (message.author.bot || !message.member || message.channel.type === ChannelType.DM) return;
     handler(message, client);
 });

@@ -1,7 +1,7 @@
 const fs = require("fs");
 const DATOS = require("../datos.json");
 
-const EloRank = require("elo-js");
+const EloRank = require("elo-rank");
 const elo = new EloRank(32);
 
 // JSON

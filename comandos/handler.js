@@ -1,6 +1,8 @@
 const { ejecutarUnirse } = require("./unirse");
 const { ejecutarAbandonar } = require("./abandonar");
 const { ejecutarPerfil } = require("./perfil");
+const { ejecutarTop } = require("./top");
+const { ejecutarComandos } = require("./comandos");
 
 const PREFIJO = "r/";
 
@@ -16,10 +18,13 @@ function handler(message) {
             ejecutarAbandonar(message);
             break;
         case `${PREFIJO}perfil`:
-            ejecutarPerfil(message, args);
+            ejecutarPerfil(message);
             break;
         case `${PREFIJO}top`:
-            ejecutarTop(message, args);
+            ejecutarTop(message);
+            break;
+        case `${PREFIJO}comandos`:
+            ejecutarComandos(message);
             break;
     }
 }

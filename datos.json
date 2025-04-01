@@ -1,9 +1,10 @@
 {
     "356952057531596800": {
         "nick": "xshrp_",
-        "id": "356952057531596800",
         "puntos": 1000,
         "totalPartidas": 0,
-        "totalGanadas": 0
+        "totalGanadas": 0,
+        "estaActivo": true,
+        "rango": "Bronce"
     }
 }

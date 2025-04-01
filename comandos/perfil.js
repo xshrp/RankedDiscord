@@ -15,12 +15,17 @@ function ejecutarPerfil(message) {
     // Obtengo los datos del usuario JSON
     const usuario = obtenerUsuario(perfilAMostrar)
 
+    let ratio = usuario.totalPartidas > 0 ? (usuario.totalGanadas / usuario.totalPartidas).toFixed(2) + " ratio" : "N/A";
+    let participa = usuario.estaActivo ? "Si" : "No";
+
     let embed = crearEmbed(
         "**Perfil**",
         `Usuario \`${usuario.nick}\`
          Puntos: \`${usuario.puntos}\`
          Partidas: \`${usuario.totalPartidas}\`
-         Ganadas: \`${usuario.totalGanadas}\`
+         Ganadas: \`${usuario.totalGanadas}\` \`(${ratio})\` 
+         Perdidas: \`${usuario.totalGanadas - usuario.totalGanadas}\` 
+         ¿Participando?: \`${participa}\`
         `,
         "#ffdf00",
         perfilAMostrar.displayAvatarURL()

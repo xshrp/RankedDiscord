@@ -8,10 +8,11 @@ function usuarioYaRegistrado(idUsuario) {
 function crearUsuario(autor) {
     DATOS[autor.id] = {
         nick: autor.username,
-        id: autor.id,
         puntos: 1000,
         totalPartidas: 0,
-        totalGanadas: 0
+        totalGanadas: 0,
+        estaActivo: true,
+        rango: "Bronce"
     };
     fs.writeFileSync("./datos.json", JSON.stringify(DATOS, null, 4));
 }

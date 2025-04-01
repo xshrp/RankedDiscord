@@ -5,8 +5,7 @@ function crearEmbed(titulo, descripcion, colorHexa, miniatura = null) {
         .setTitle(titulo)
         .setDescription(descripcion)
         .setColor(colorHexa)
-        .setFooter({ text: "RDZ - Ranked" })
-        .setTimestamp();
+        .setFooter({ text: "Duck Game - Ranked" })
     if (miniatura) embed.setThumbnail(miniatura);
     return embed;
 }

@@ -7,14 +7,14 @@ function ejecutarTop(message) {
         let usuario = DATOS[id];
         ranking.push(usuario);
     }
-    ranking.sort((a, b) => b.puntos - a.puntos);
+    ranking.sort((a, b) => b.elo - a.elo);
 
     if (ranking.length == 0) {
         message.channel.send({ embeds: [crearEmbed("Error", "No hay usuarios registrados.", "#ff0000")] })
         return;
     }
 
-    let puestos = "", nombres = "", puntos = "";
+    let puestos = "", nombres = "", elos = "";
     let maximo = Math.min(10, ranking.length);
 
     for (let i = 0; i < maximo; i++) {
@@ -22,13 +22,13 @@ function ejecutarTop(message) {
 
         puestos += `\`${i + 1}\`\n`;
         nombres += `\`${usuario.nick}\`\n`;
-        puntos += `\`${usuario.puntos}\`\n`
+        elos += `\`${usuario.elo}\`\n`
     }
 
     let embed = crearEmbed("**Top**", null, "ffdf00");
     embed.addFields({ name: "Puesto", value: puestos, inline: true });
     embed.addFields({ name: "Nombre", value: nombres, inline: true });
-    embed.addFields({ name: "Elo", value: puntos, inline: true });
+    embed.addFields({ name: "Elo", value: elos, inline: true });
     message.channel.send({ embeds: [embed] });
 }
 

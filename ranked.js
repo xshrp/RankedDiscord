@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { Client, GatewayIntentBits } = require('discord.js');
+const { Client, GatewayIntentBits, ChannelType } = require('discord.js');
 const { handler } = require('./comandos/handler');
 const config = require("./config.json");
 
@@ -8,7 +8,7 @@ const client = new Client({
 });
 
 client.once("ready", () => {
-    console.log("¡Bot Ranked encendido!.");
+    console.log("¡Bot Ranked encendido!");
     setInterval(() => {
         const ESTADOS = [
             "Duck Game - Ranked",
@@ -24,8 +24,8 @@ client.once("ready", () => {
 });
 
 client.on("messageCreate", (message) => {
-    if (message.author.bot || !message.member) return;
-    handler(message);
+    if (message.author.bot || !message.member || message.channel.type === ChannelType.DM) return;
+    handler(message, client);
 });
 
 client.login(process.env.TOKEN);

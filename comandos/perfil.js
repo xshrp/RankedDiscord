@@ -20,12 +20,12 @@ function ejecutarPerfil(message) {
 
     let embed = crearEmbed(
         "**Perfil**",
-        `Usuario \`${usuario.nick}\`
-         Puntos: \`${usuario.puntos}\`
+        `Usuario \`${usuario.nick}\`\n      
+         Elo: \`${usuario.elo}\`
+         Rango: \`${usuario.rango}\`\n 
          Partidas: \`${usuario.totalPartidas}\`
          Ganadas: \`${usuario.totalGanadas}\` \`(${ratio})\` 
          Perdidas: \`${usuario.totalGanadas - usuario.totalGanadas}\` 
-         ¿Participando?: \`${participa}\`
         `,
         "#ffdf00",
         perfilAMostrar.displayAvatarURL()

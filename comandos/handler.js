@@ -3,10 +3,12 @@ const { ejecutarAbandonar } = require("./abandonar");
 const { ejecutarPerfil } = require("./perfil");
 const { ejecutarTop } = require("./top");
 const { ejecutarComandos } = require("./comandos");
+const { ejecutarBackupManual } = require("./backup");
+const { ejecutarWin } = require("./win");
 
 const PREFIJO = "r/";
 
-function handler(message) {
+function handler(message, client) {
     const args = message.content.split(/ +/g);
     const command = args.shift().toLowerCase();
 
@@ -25,6 +27,12 @@ function handler(message) {
             break;
         case `${PREFIJO}comandos`:
             ejecutarComandos(message);
+            break;
+        case `${PREFIJO}backup`:
+            ejecutarBackupManual(message);
+            break;
+        case `${PREFIJO}win`:
+            ejecutarWin(message, client);
             break;
     }
 }
